@@ -14,10 +14,14 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render title', async () => {
+  it('should render the brand and hero headline', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, brunosilvapersonal');
+    expect(compiled.textContent).toContain('Bruno Silva');
+    expect(compiled.textContent).toContain('Personal Trainer');
+    expect(compiled.querySelector('h1')?.textContent).toContain(
+      'Treinos personalizados para quem quer resultados de verdade',
+    );
   });
 });
