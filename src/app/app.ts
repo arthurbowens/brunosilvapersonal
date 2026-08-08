@@ -78,7 +78,7 @@ export class App {
     'Quem quer emagrecer com saúde',
     'Quem deseja ganhar massa muscular',
     'Quem quer melhorar o condicionamento físico',
-    'Corredores iniciantes e intermediários',
+    'Corredores de todos os níveis',
     'Gestantes',
     'Puérperas',
     'Idosos',
