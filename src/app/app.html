@@ -117,7 +117,7 @@
       <div class="flex flex-col justify-center px-5 py-12 md:px-8 lg:py-20 xl:pr-6">
         <p class="animate-fade-up inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-sky">
           <span class="h-px w-8 bg-royal"></span>
-          Consultoria online · Niterói
+          Online para todo o Brasil · Presencial em Niterói
         </p>
 
         <h1 class="animate-fade-up-delay-1 mt-6 max-w-xl font-display text-[2.35rem] font-bold leading-[1.05] tracking-tight text-fog sm:text-5xl lg:text-[3.4rem]">
@@ -129,7 +129,7 @@
         </p>
 
         <p class="animate-fade-up-delay-2 mt-4 max-w-md text-sm leading-relaxed text-mist/80 sm:text-base">
-          Sem perder tempo e sem colocar a saúde em risco — com planejamento exclusivo para sua rotina e
+          Sem perder tempo e sem colocar a saúde em risco, com planejamento exclusivo para sua rotina e
           acompanhamento de perto.
         </p>
 
@@ -342,10 +342,10 @@
             </svg>
           </div>
           <h2 class="font-display text-3xl font-bold tracking-tight text-fog">Consultoria Online</h2>
-          <p class="mt-2 text-sky">Treine de qualquer lugar.</p>
+          <p class="mt-2 text-sky">Online para todo o Brasil.</p>
           <p class="mt-6 text-base leading-relaxed text-mist">
-            Mesmo à distância, você recebe acompanhamento completo. Seu treino é atualizado sempre que necessário,
-            suas dúvidas são respondidas e seus movimentos são analisados através de vídeos.
+            A distância não limita o acompanhamento. Seu treino é atualizado sempre que necessário, suas dúvidas são
+            respondidas e seus movimentos são analisados através de vídeos, de qualquer cidade do país.
           </p>
           <p class="mt-4 font-medium text-fog">Um profissional acompanhando sua evolução de perto.</p>
           <a
@@ -371,18 +371,31 @@
           <h2 class="font-display text-3xl font-bold tracking-tight text-fog">Atendimento Presencial</h2>
           <p class="mt-2 text-sky">Personal Trainer em Niterói</p>
           <p class="mt-6 text-base leading-relaxed text-mist">
-            Se você mora em Niterói, também pode realizar treinos presenciais com acompanhamento individual durante
-            toda a sessão.
+            Se você está em Niterói, pode treinar presencialmente com acompanhamento individual durante toda a sessão,
+            com planejamento, execução correta e evolução constante.
           </p>
-          <p class="mt-4 font-medium text-fog">Planejamento, execução correta e evolução constante.</p>
-          <a
-            [href]="whatsappComecar"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="mt-8 inline-flex items-center gap-2 rounded-xl border border-royal/50 bg-royal/10 px-5 py-3 text-sm font-semibold text-sky transition hover:bg-royal/20"
-          >
-            Quero treino presencial
-          </a>
+          <p class="mt-4 text-base leading-relaxed text-mist">
+            Também ofereço <span class="font-medium text-fog">avaliação física avulsa</span> para quem busca apenas
+            esse serviço, sem contratar a consultoria completa.
+          </p>
+          <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <a
+              [href]="whatsappComecar"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center gap-2 rounded-xl border border-royal/50 bg-royal/10 px-5 py-3 text-sm font-semibold text-sky transition hover:bg-royal/20"
+            >
+              Quero treino presencial
+            </a>
+            <a
+              [href]="whatsappAvaliacao"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center gap-2 rounded-xl bg-whatsapp px-5 py-3 text-sm font-semibold text-ink transition hover:brightness-110"
+            >
+              Quero só a avaliação
+            </a>
+          </div>
         </div>
       </article>
     </div>
@@ -395,8 +408,12 @@
         <div>
           <p class="text-xs font-semibold uppercase tracking-[0.22em] text-sky">Sobre o profissional</p>
           <h2 class="mt-4 font-display text-3xl font-bold tracking-tight text-fog md:text-5xl">
-            Mais de 10 anos ajudando pessoas a conquistarem resultados.
+            Bruno Silva
           </h2>
+          <p class="mt-4 text-lg font-medium leading-relaxed text-sky md:text-xl">
+            Profissional de Educação Física, com especializações em treinamento físico, biomecânica, cinesiologia,
+            Pilates e outras áreas, e mais de 10 anos de experiência.
+          </p>
           <a
             [href]="whatsappAvaliacao"
             target="_blank"
@@ -414,12 +431,15 @@
 
         <div class="space-y-5 text-base leading-relaxed text-mist md:text-lg">
           <p>
-            Ao longo da minha carreira, ajudei alunos dos mais diferentes perfis a alcançarem seus objetivos através
-            de um treinamento baseado em ciência, técnica e acompanhamento individual.
+            Meu trabalho é unir ciência, experiência prática e individualização para desenvolver um treinamento que
+            faça sentido para o objetivo, a rotina e as necessidades de cada pessoa.
+          </p>
+          <p>
+            Ao longo desses anos, acompanhei alunos dos mais diferentes perfis e aprendi que resultado consistente
+            nasce de planejamento, constância e orientação de perto, não de planilha genérica.
           </p>
           <p class="text-fog">
-            Minha missão é mostrar que resultados consistentes acontecem quando existe planejamento, constância e
-            orientação profissional.
+            Se você está buscando alguém para caminhar junto nessa evolução, será um prazer te conhecer.
           </p>
         </div>
       </div>
@@ -520,6 +540,6 @@
       </svg>
       Falar no WhatsApp
     </a>
-    <p class="text-sm text-mist/70">Niterói · Consultoria Online</p>
+    <p class="text-sm text-mist/70">Online para todo o Brasil · Presencial em Niterói</p>
   </div>
 </footer>

@@ -13,7 +13,7 @@ export class App {
   private readonly whatsappPhone = '5521999999999';
 
   protected readonly whatsappAvaliacao = this.buildWhatsAppLink(
-    'Olá, Bruno! Quero agendar minha avaliação.',
+    'Olá, Bruno! Quero agendar uma avaliação física.',
   );
 
   protected readonly whatsappComecar = this.buildWhatsAppLink(
@@ -86,6 +86,7 @@ export class App {
   protected readonly formation = [
     'Pós-graduação em Cinesiologia, Biomecânica e Treinamento Físico',
     'Pós-graduação em Psicomotricidade',
+    'Especialização em Pilates',
     'Graduando em Nutrição',
     'Pós-graduação em andamento em Suplementação e Nutrição Esportiva',
   ] as const;
@@ -95,6 +96,7 @@ export class App {
     'Emagrecimento',
     'Corrida',
     'Condicionamento Físico',
+    'Pilates',
     'Gestantes',
     'Puérperas',
     'Idosos',
