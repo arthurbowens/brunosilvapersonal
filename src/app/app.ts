@@ -9,15 +9,17 @@ import { Component, signal } from '@angular/core';
 export class App {
   protected readonly menuOpen = signal(false);
 
-  /** Substitua pelo WhatsApp real com DDI + DDD (somente números). */
-  private readonly whatsappPhone = '5521999999999';
+  private readonly whatsappPhone = '5521981394290';
+
+  protected readonly instagramUrl = 'https://www.instagram.com/andrrereis';
+  protected readonly cref = '047611-G/RJ';
 
   protected readonly whatsappAvaliacao = this.buildWhatsAppLink(
-    'Olá, Bruno! Quero agendar uma avaliação física.',
+    'Olá, André! Quero agendar uma avaliação física.',
   );
 
   protected readonly whatsappComecar = this.buildWhatsAppLink(
-    'Olá, Bruno! Quero começar meu acompanhamento personalizado.',
+    'Olá, André! Quero começar meu acompanhamento personalizado.',
   );
 
   protected readonly navLinks = [
