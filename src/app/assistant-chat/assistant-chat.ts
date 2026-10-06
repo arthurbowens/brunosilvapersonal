@@ -128,6 +128,16 @@ export class AssistantChat {
     return '';
   }
 
+  protected onComposerInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    let value = target.value;
+    if (this.step() === 'age') {
+      value = value.replace(/\D/g, '').slice(0, 3);
+      if (target.value !== value) target.value = value;
+    }
+    this.inputValue.set(value);
+  }
+
   protected inputPlaceholder(): string {
     switch (this.step()) {
       case 'name':
@@ -139,10 +149,6 @@ export class AssistantChat {
       default:
         return 'Digite sua resposta...';
     }
-  }
-
-  protected inputType(): string {
-    return this.step() === 'age' ? 'number' : 'text';
   }
 
   protected submitText(): void {
@@ -249,10 +255,13 @@ export class AssistantChat {
       bottom: `${bottom}px`,
       height: `${height}px`,
       maxHeight: `${height}px`,
-      left: '0',
-      right: '0',
+      left: '0px',
+      right: '0px',
       width: '100%',
       borderRadius: '1.1rem 1.1rem 0 0',
+      borderLeft: '0',
+      borderRight: '0',
+      borderBottom: '0',
     });
   }
 

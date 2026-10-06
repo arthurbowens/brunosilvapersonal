@@ -105,12 +105,13 @@
           <input
             #chatInput
             class="assistant-input"
-            [attr.type]="inputType()"
+            type="text"
             [placeholder]="inputPlaceholder()"
             [value]="inputValue()"
-            (input)="inputValue.set($any($event.target).value)"
+            (input)="onComposerInput($event)"
             autocomplete="off"
             [attr.inputmode]="step() === 'age' ? 'numeric' : 'text'"
+            [attr.pattern]="step() === 'age' ? '[0-9]*' : null"
           />
           <button
             type="submit"
