@@ -3,6 +3,7 @@
   type="button"
   class="assistant-fab"
   [class.assistant-fab-open]="open()"
+  [class.assistant-fab-hidden]="keyboardMode()"
   [attr.aria-expanded]="open()"
   aria-controls="assistant-panel"
   [attr.aria-label]="open() ? 'Fechar conversa com André' : 'Abrir Assistente André Reis'"
@@ -28,6 +29,8 @@
   <section
     id="assistant-panel"
     class="assistant-panel"
+    [class.assistant-panel-keyboard]="keyboardMode()"
+    [ngStyle]="panelStyle()"
     role="dialog"
     aria-label="Conversa com André Reis"
   >
@@ -112,6 +115,8 @@
           [placeholder]="inputPlaceholder()"
           [value]="inputValue()"
           (input)="inputValue.set($any($event.target).value)"
+          (focus)="onInputFocus()"
+          (blur)="onInputBlur()"
           autocomplete="off"
           [attr.inputmode]="step() === 'age' ? 'numeric' : 'text'"
         />

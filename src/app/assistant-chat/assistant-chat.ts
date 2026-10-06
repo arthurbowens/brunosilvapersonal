@@ -1,4 +1,14 @@
-import { Component, ElementRef, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  afterNextRender,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { NgStyle } from '@angular/common';
 
 type StepId = 'name' | 'age' | 'city' | 'goal' | 'difficulty' | 'done';
 
@@ -10,13 +20,15 @@ interface ChatMessage {
 
 @Component({
   selector: 'app-assistant-chat',
-  imports: [],
+  imports: [NgStyle],
   templateUrl: './assistant-chat.html',
   styleUrl: './assistant-chat.css',
 })
 export class AssistantChat {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly messagesEl = viewChild<ElementRef<HTMLElement>>('messagesBox');
   private messageId = 0;
+  private inputFocused = false;
 
   private readonly whatsappPhone = '5521981394290';
 
@@ -25,6 +37,8 @@ export class AssistantChat {
   protected readonly typing = signal(false);
   protected readonly step = signal<StepId>('name');
   protected readonly messages = signal<ChatMessage[]>([]);
+  protected readonly keyboardMode = signal(false);
+  protected readonly panelStyle = signal<Record<string, string>>({});
   protected readonly answers = signal({
     name: '',
     age: '',
@@ -52,16 +66,58 @@ export class AssistantChat {
     'Não sei por onde começar',
   ] as const;
 
+  constructor() {
+    afterNextRender(() => {
+      const sync = () => this.syncPanelToViewport();
+      const vv = window.visualViewport;
+      vv?.addEventListener('resize', sync);
+      vv?.addEventListener('scroll', sync);
+      window.addEventListener('resize', sync);
+      this.destroyRef.onDestroy(() => {
+        vv?.removeEventListener('resize', sync);
+        vv?.removeEventListener('scroll', sync);
+        window.removeEventListener('resize', sync);
+      });
+    });
+
+    effect(() => {
+      if (this.open()) {
+        queueMicrotask(() => this.syncPanelToViewport());
+      } else {
+        this.inputFocused = false;
+        this.keyboardMode.set(false);
+        this.panelStyle.set({});
+      }
+    });
+  }
+
   protected toggle(): void {
     this.open.update((v) => !v);
     if (this.open() && this.messages().length === 0) {
       this.startConversation();
     }
-    queueMicrotask(() => this.scrollToBottom());
+    queueMicrotask(() => {
+      this.syncPanelToViewport();
+      this.scrollToBottom();
+    });
   }
 
   protected close(): void {
     this.open.set(false);
+  }
+
+  protected onInputFocus(): void {
+    this.inputFocused = true;
+    this.syncPanelToViewport();
+    setTimeout(() => {
+      this.syncPanelToViewport();
+      this.scrollToBottom();
+    }, 350);
+  }
+
+  protected onInputBlur(): void {
+    this.inputFocused = false;
+    setTimeout(() => this.syncPanelToViewport(), 150);
   }
 
   protected currentChoices(): readonly string[] | null {
@@ -161,6 +217,51 @@ export class AssistantChat {
     this.step.set('name');
     this.inputValue.set('');
     this.startConversation();
+  }
+
+  private syncPanelToViewport(): void {
+    if (!this.open() || typeof window === 'undefined') return;
+
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    if (!isMobile) {
+      this.keyboardMode.set(false);
+      this.panelStyle.set({});
+      return;
+    }
+
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    const keyboardUp = this.inputFocused || covered > 100;
+    this.keyboardMode.set(keyboardUp);
+
+    if (keyboardUp) {
+      const top = vv.offsetTop + 6;
+      const height = Math.max(240, vv.height - 12);
+      this.panelStyle.set({
+        top: `${top}px`,
+        bottom: 'auto',
+        height: `${height}px`,
+        maxHeight: `${height}px`,
+        right: '0.65rem',
+        left: '0.65rem',
+        width: 'auto',
+      });
+    } else {
+      const bottomInset = Math.max(0, window.innerHeight - (vv.offsetTop + vv.height));
+      this.panelStyle.set({
+        top: 'auto',
+        bottom: `${bottomInset + 68}px`,
+        height: `${Math.min(vv.height * 0.58, 28 * 16)}px`,
+        maxHeight: `${Math.max(260, vv.height - 90)}px`,
+        right: '0.85rem',
+        left: 'auto',
+        width: 'min(calc(100vw - 1.7rem), 21rem)',
+      });
+    }
+
+    this.scrollToBottom();
   }
 
   private startConversation(): void {
