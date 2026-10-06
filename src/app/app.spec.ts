@@ -21,7 +21,7 @@ describe('App', () => {
     expect(compiled.textContent).toContain('André Reis');
     expect(compiled.textContent).toContain('Personal Trainer');
     expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Treinos personalizados para quem quer resultados de verdade',
+      'Planejamento exclusivo para o seu corpo e a sua rotina',
     );
   });
 });

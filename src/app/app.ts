@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
+import { AssistantChat } from './assistant-chat/assistant-chat';
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [AssistantChat],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -11,7 +12,7 @@ export class App {
 
   private readonly whatsappPhone = '5521981394290';
 
-  protected readonly instagramUrl = 'https://www.instagram.com/andrrereis';
+  protected readonly instagramUrl = 'https://www.instagram.com/andrereispersonal';
   protected readonly cref = '047611-G/RJ';
 
   protected readonly whatsappAvaliacao = this.buildWhatsAppLink(

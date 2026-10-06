@@ -1,0 +1,131 @@
+<!-- FAB -->
+<button
+  type="button"
+  class="assistant-fab"
+  [class.assistant-fab-open]="open()"
+  [attr.aria-expanded]="open()"
+  aria-controls="assistant-panel"
+  [attr.aria-label]="open() ? 'Fechar conversa com André' : 'Abrir Assistente André Reis'"
+  (click)="toggle()"
+>
+  @if (open()) {
+    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+    </svg>
+    <span class="assistant-fab-label">Fechar</span>
+  } @else {
+    <span class="assistant-fab-photo-wrap">
+      <img src="/foto1.jpeg" alt="" class="assistant-fab-photo" />
+      <span class="assistant-fab-pulse" aria-hidden="true"></span>
+    </span>
+    <span class="assistant-fab-copy">
+      <span class="assistant-fab-title">Assistente André Reis</span>
+    </span>
+  }
+</button>
+
+@if (open()) {
+  <section
+    id="assistant-panel"
+    class="assistant-panel"
+    role="dialog"
+    aria-label="Conversa com André Reis"
+  >
+    <header class="assistant-header">
+      <div class="assistant-header-user">
+        <div class="assistant-avatar-ring">
+          <img src="/foto1.jpeg" alt="" class="assistant-avatar" />
+        </div>
+        <div>
+          <p class="assistant-name">André Reis</p>
+          <p class="assistant-status">Personal Trainer · Online agora</p>
+        </div>
+      </div>
+      <button type="button" class="assistant-close" aria-label="Fechar" (click)="close()">
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </header>
+
+    <div #messagesBox class="assistant-messages">
+      @for (msg of messages(); track msg.id) {
+        <div class="assistant-row" [class.assistant-row-user]="msg.from === 'user'">
+          @if (msg.from === 'bot') {
+            <img src="/foto1.jpeg" alt="" class="assistant-bubble-avatar" />
+          }
+          <div class="assistant-bubble" [class.assistant-bubble-user]="msg.from === 'user'">
+            {{ msg.text }}
+          </div>
+        </div>
+      }
+
+      @if (typing()) {
+        <div class="assistant-row">
+          <img src="/foto1.jpeg" alt="" class="assistant-bubble-avatar" />
+          <div class="assistant-bubble assistant-typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+
+      @if (!typing()) {
+        @if (currentChoices(); as choices) {
+          <div class="assistant-choices">
+            @for (option of choices; track option) {
+              <button type="button" class="assistant-choice" (click)="selectChoice(option)">
+                {{ option }}
+              </button>
+            }
+          </div>
+        }
+
+        @if (step() === 'done') {
+          <div class="assistant-done">
+            <a
+              [href]="whatsappUrl()"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="assistant-whatsapp"
+            >
+              <svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path
+                  d="M20.52 3.48A11.86 11.86 0 0 0 12.06 0C5.5 0 .16 5.34.16 11.9c0 2.1.55 4.15 1.6 5.96L0 24l6.3-1.65a11.86 11.86 0 0 0 5.76 1.47h.01c6.55 0 11.9-5.34 11.9-11.9 0-3.18-1.24-6.17-3.45-8.44ZM12.07 21.8h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.64-.24-.37a9.86 9.86 0 0 1-1.51-5.28c0-5.45 4.44-9.89 9.9-9.89a9.82 9.82 0 0 1 9.88 9.9c0 5.45-4.44 9.89-9.89 9.89Zm5.42-7.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.64.07-.3-.15-1.25-.46-2.38-1.47-.88-.78-1.47-1.75-1.64-2.04-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.07 2.88 1.22 3.08c.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.63.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35Z"
+                />
+              </svg>
+              Enviar no WhatsApp
+            </a>
+            <p class="assistant-fallback">Se não abriu automaticamente, toque no botão acima.</p>
+            <button type="button" class="assistant-restart" (click)="restart()">
+              Refazer perguntas
+            </button>
+          </div>
+        }
+      }
+    </div>
+
+    @if (needsTextInput()) {
+      <form class="assistant-composer" (submit)="$event.preventDefault(); submitText()">
+        <input
+          class="assistant-input"
+          [attr.type]="inputType()"
+          [placeholder]="inputPlaceholder()"
+          [value]="inputValue()"
+          (input)="inputValue.set($any($event.target).value)"
+          autocomplete="off"
+          [attr.inputmode]="step() === 'age' ? 'numeric' : 'text'"
+        />
+        <button
+          type="submit"
+          class="assistant-send"
+          [disabled]="!inputValue().trim() || typing()"
+          aria-label="Enviar"
+        >
+          <svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
+          </svg>
+        </button>
+      </form>
+    }
+  </section>
+}
