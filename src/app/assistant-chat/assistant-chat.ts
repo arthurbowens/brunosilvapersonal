@@ -27,8 +27,9 @@ interface ChatMessage {
 export class AssistantChat {
   private readonly destroyRef = inject(DestroyRef);
   private readonly messagesEl = viewChild<ElementRef<HTMLElement>>('messagesBox');
+  private readonly chatInput = viewChild<ElementRef<HTMLInputElement>>('chatInput');
   private messageId = 0;
-  private inputFocused = false;
+  private lastPanelKey = '';
 
   private readonly whatsappPhone = '5521981394290';
 
@@ -37,7 +38,7 @@ export class AssistantChat {
   protected readonly typing = signal(false);
   protected readonly step = signal<StepId>('name');
   protected readonly messages = signal<ChatMessage[]>([]);
-  protected readonly keyboardMode = signal(false);
+  protected readonly mobileSheet = signal(false);
   protected readonly panelStyle = signal<Record<string, string>>({});
   protected readonly answers = signal({
     name: '',
@@ -84,9 +85,9 @@ export class AssistantChat {
       if (this.open()) {
         queueMicrotask(() => this.syncPanelToViewport());
       } else {
-        this.inputFocused = false;
-        this.keyboardMode.set(false);
+        this.mobileSheet.set(false);
         this.panelStyle.set({});
+        this.lastPanelKey = '';
       }
     });
   }
@@ -99,25 +100,14 @@ export class AssistantChat {
     queueMicrotask(() => {
       this.syncPanelToViewport();
       this.scrollToBottom();
+      if (this.open() && this.needsTextInput()) {
+        this.focusInput();
+      }
     });
   }
 
   protected close(): void {
     this.open.set(false);
-  }
-
-  protected onInputFocus(): void {
-    this.inputFocused = true;
-    this.syncPanelToViewport();
-    setTimeout(() => {
-      this.syncPanelToViewport();
-      this.scrollToBottom();
-    }, 350);
-  }
-
-  protected onInputBlur(): void {
-    this.inputFocused = false;
-    setTimeout(() => this.syncPanelToViewport(), 150);
   }
 
   protected currentChoices(): readonly string[] | null {
@@ -130,6 +120,12 @@ export class AssistantChat {
   protected needsTextInput(): boolean {
     const s = this.step();
     return s === 'name' || s === 'age' || s === 'city';
+  }
+
+  protected composerHint(): string {
+    if (this.step() === 'done') return 'Quase lá...';
+    if (this.currentChoices()) return 'Escolha uma opção acima';
+    return '';
   }
 
   protected inputPlaceholder(): string {
@@ -157,6 +153,7 @@ export class AssistantChat {
     if (s === 'age' && (!/^\d{1,3}$/.test(value) || Number(value) < 10 || Number(value) > 100)) {
       this.pushBot('Me conta uma idade válida, por favor (só o número).');
       this.inputValue.set('');
+      this.focusInput();
       return;
     }
 
@@ -165,15 +162,16 @@ export class AssistantChat {
 
     if (s === 'name') {
       this.answers.update((a) => ({ ...a, name: value }));
-      this.askNext('age', `Prazer, ${value.split(' ')[0]}! Qual a sua idade?`);
+      this.askNext('age', `Prazer, ${value.split(' ')[0]}! Qual a sua idade?`, true);
     } else if (s === 'age') {
       this.answers.update((a) => ({ ...a, age: value }));
-      this.askNext('city', 'Em qual cidade você mora?');
+      this.askNext('city', 'Em qual cidade você mora?', true);
     } else if (s === 'city') {
       this.answers.update((a) => ({ ...a, city: value }));
       this.askNext(
         'goal',
         'Perfeito. Qual é o seu principal objetivo agora? Escolha uma opção:',
+        false,
       );
     }
   }
@@ -190,6 +188,7 @@ export class AssistantChat {
       this.askNext(
         'difficulty',
         'E qual é a sua maior dificuldade hoje? Escolha uma opção:',
+        false,
       );
     } else {
       this.answers.update((a) => ({ ...a, difficulty: option }));
@@ -224,44 +223,37 @@ export class AssistantChat {
 
     const isMobile = window.matchMedia('(max-width: 768px)').matches;
     if (!isMobile) {
-      this.keyboardMode.set(false);
+      this.mobileSheet.set(false);
       this.panelStyle.set({});
+      this.lastPanelKey = '';
       return;
     }
 
+    this.mobileSheet.set(true);
+
     const vv = window.visualViewport;
-    if (!vv) return;
+    const offsetTop = vv?.offsetTop ?? 0;
+    const vvHeight = vv?.height ?? window.innerHeight;
 
-    const covered = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-    const keyboardUp = this.inputFocused || covered > 100;
-    this.keyboardMode.set(keyboardUp);
+    // Sempre ancora no rodapé da área visível (acima do teclado).
+    // Nunca troca entre top/bottom, isso evita o "pulo" a cada pergunta.
+    const bottom = Math.round(Math.max(0, window.innerHeight - offsetTop - vvHeight));
+    const height = Math.round(Math.min(vvHeight - 10, Math.max(300, vvHeight * 0.82)));
+    const key = `${bottom}:${height}`;
 
-    if (keyboardUp) {
-      const top = vv.offsetTop + 6;
-      const height = Math.max(240, vv.height - 12);
-      this.panelStyle.set({
-        top: `${top}px`,
-        bottom: 'auto',
-        height: `${height}px`,
-        maxHeight: `${height}px`,
-        right: '0.65rem',
-        left: '0.65rem',
-        width: 'auto',
-      });
-    } else {
-      const bottomInset = Math.max(0, window.innerHeight - (vv.offsetTop + vv.height));
-      this.panelStyle.set({
-        top: 'auto',
-        bottom: `${bottomInset + 68}px`,
-        height: `${Math.min(vv.height * 0.58, 28 * 16)}px`,
-        maxHeight: `${Math.max(260, vv.height - 90)}px`,
-        right: '0.85rem',
-        left: 'auto',
-        width: 'min(calc(100vw - 1.7rem), 21rem)',
-      });
-    }
+    if (key === this.lastPanelKey) return;
+    this.lastPanelKey = key;
 
-    this.scrollToBottom();
+    this.panelStyle.set({
+      top: 'auto',
+      bottom: `${bottom}px`,
+      height: `${height}px`,
+      maxHeight: `${height}px`,
+      left: '0',
+      right: '0',
+      width: '100%',
+      borderRadius: '1.1rem 1.1rem 0 0',
+    });
   }
 
   private startConversation(): void {
@@ -279,16 +271,23 @@ export class AssistantChat {
       this.pushBot('Primeiro: qual o seu nome?');
       this.step.set('name');
       this.scrollToBottom();
+      this.focusInput();
     });
   }
 
-  private askNext(next: StepId, text: string): void {
+  private askNext(next: StepId, text: string, keepKeyboard: boolean): void {
     this.step.set(next);
     this.typing.set(true);
-    this.delay(650).then(() => {
+    if (!keepKeyboard) {
+      this.chatInput()?.nativeElement?.blur();
+    }
+    this.delay(550).then(() => {
       this.typing.set(false);
       this.pushBot(text);
       this.scrollToBottom();
+      if (keepKeyboard) {
+        this.focusInput();
+      }
     });
   }
 
@@ -304,6 +303,13 @@ export class AssistantChat {
     }).then(() => {
       window.open(this.whatsappUrl(), '_blank', 'noopener,noreferrer');
     });
+  }
+
+  private focusInput(): void {
+    setTimeout(() => {
+      this.chatInput()?.nativeElement?.focus({ preventScroll: true });
+      this.scrollToBottom();
+    }, 80);
   }
 
   private pushBot(text: string): void {

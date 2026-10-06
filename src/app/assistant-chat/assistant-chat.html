@@ -2,34 +2,26 @@
 <button
   type="button"
   class="assistant-fab"
-  [class.assistant-fab-open]="open()"
-  [class.assistant-fab-hidden]="keyboardMode()"
+  [class.assistant-fab-hidden]="open()"
   [attr.aria-expanded]="open()"
   aria-controls="assistant-panel"
   [attr.aria-label]="open() ? 'Fechar conversa com André' : 'Abrir Assistente André Reis'"
   (click)="toggle()"
 >
-  @if (open()) {
-    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
-    </svg>
-    <span class="assistant-fab-label">Fechar</span>
-  } @else {
-    <span class="assistant-fab-photo-wrap">
-      <img src="/foto1.jpeg" alt="" class="assistant-fab-photo" />
-      <span class="assistant-fab-pulse" aria-hidden="true"></span>
-    </span>
-    <span class="assistant-fab-copy">
-      <span class="assistant-fab-title">Assistente André Reis</span>
-    </span>
-  }
+  <span class="assistant-fab-photo-wrap">
+    <img src="/foto1.jpeg" alt="" class="assistant-fab-photo" />
+    <span class="assistant-fab-pulse" aria-hidden="true"></span>
+  </span>
+  <span class="assistant-fab-copy">
+    <span class="assistant-fab-title">Assistente André Reis</span>
+  </span>
 </button>
 
 @if (open()) {
   <section
     id="assistant-panel"
     class="assistant-panel"
-    [class.assistant-panel-keyboard]="keyboardMode()"
+    [class.assistant-panel-sheet]="mobileSheet()"
     [ngStyle]="panelStyle()"
     role="dialog"
     aria-label="Conversa com André Reis"
@@ -107,30 +99,33 @@
       }
     </div>
 
-    @if (needsTextInput()) {
-      <form class="assistant-composer" (submit)="$event.preventDefault(); submitText()">
-        <input
-          class="assistant-input"
-          [attr.type]="inputType()"
-          [placeholder]="inputPlaceholder()"
-          [value]="inputValue()"
-          (input)="inputValue.set($any($event.target).value)"
-          (focus)="onInputFocus()"
-          (blur)="onInputBlur()"
-          autocomplete="off"
-          [attr.inputmode]="step() === 'age' ? 'numeric' : 'text'"
-        />
-        <button
-          type="submit"
-          class="assistant-send"
-          [disabled]="!inputValue().trim() || typing()"
-          aria-label="Enviar"
-        >
-          <svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
-          </svg>
-        </button>
-      </form>
-    }
+    <div class="assistant-composer">
+      @if (needsTextInput()) {
+        <form class="assistant-composer-form" (submit)="$event.preventDefault(); submitText()">
+          <input
+            #chatInput
+            class="assistant-input"
+            [attr.type]="inputType()"
+            [placeholder]="inputPlaceholder()"
+            [value]="inputValue()"
+            (input)="inputValue.set($any($event.target).value)"
+            autocomplete="off"
+            [attr.inputmode]="step() === 'age' ? 'numeric' : 'text'"
+          />
+          <button
+            type="submit"
+            class="assistant-send"
+            [disabled]="!inputValue().trim() || typing()"
+            aria-label="Enviar"
+          >
+            <svg class="size-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z" />
+            </svg>
+          </button>
+        </form>
+      } @else {
+        <p class="assistant-composer-hint">{{ composerHint() }}</p>
+      }
+    </div>
   </section>
 }
